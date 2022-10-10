@@ -48,24 +48,21 @@ while True:
         # GET_finder.split(GET_finder = "Get")
 
        # Stripping the pth down
-       os.path.split("file1.txt") 
+    #    os.path.split("file1.txt") 
 
        #MIME 
-       Content-Type: text/plain; charset=iso-8859-1
+    #    Content-Type: text/plain; charset=iso-8859-1
 
 
        #READing file
-       try:
-            with open(filename) as fp:
-                data = fp.read()   # Read entire file
-                return data
+    #    try:
+    #         with open(filename) as fp:
+    #             data = fp.read()   # Read entire file
+    #             return data
 
-        except:
-            # File not found or other error
-            # TODO send a 404
+    #     except:
+    #         # File not found or other error
+    #         # TODO send a 404
 
-
-
-
-
-        
+    #MAPPIng
+map_ext = {'.gif': 'image/gif', '.txt': 'text/plain', '.html': 'text/HTML', '.jpeg': 'JPEG image', '.pdf': 'PDF file'}
