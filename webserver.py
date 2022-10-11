@@ -1,5 +1,6 @@
 import socket
 import sys
+import os
 
 #Server Side
 
@@ -12,57 +13,55 @@ s.bind(('',int(user_input)))
 #listen for incoming connection
 s.listen()
 print(f'Listening... on host {user_input}',)
-data = b""
+map_ext =  {'.txt': 'text/plain', '.ico': 'image/x-icon', '.html': 'text/html'}
+def get_request(new_socket):
+    data = new_socket.recv(4096)
+    result = ""
+    while True:
+        result = result + data.decode("ISO-8859-1")
+        
+        if b"\r\n\r\n" in data:
+            return result
+        print(result)
+        data = new_socket.recv(4096)
+
 while True:
-        connection = s.accept()
-        print(connection)
-        new_socket = connection[0]  # This is what we'll recv/send on
     #Accept incoming connection
-        while True:
-            data = new_socket.recv(4096)
-
-            if b"\r\n\r\n" in data:
-                break
-        print(data.decode("ISO-8859-1"))
-        ht = "HTTP/1.1 200 OK\r\n\
-        You are awake"
-        enht = ht.encode("ISO-8859-1")
-        new_socket.sendall(enht)
+    connection = s.accept()
+    print(connection)
+    new_socket = connection[0]  # This is what we'll recv/send on
+    client_req = get_request(new_socket)
 
 
+    #PROJECT 3
 
-    # while True:
-    #     print(data.decode("ISO-8859-1"))
-        # data = s.recv(4096)
-
-
-
-        new_socket.close()
-
-        #PROJECT 3
-
-        required_text = ('GET /file1.txt HTTP/1.1\r\n')
-        required_text.split(" ")
-
-        # GET_finder = ht.find("GET")
-        # GET_finder.split(GET_finder = "Get")
-
-       # Stripping the pth down
-    #    os.path.split("file1.txt") 
-
-       #MIME 
-    #    Content-Type: text/plain; charset=iso-8859-1
+    parse_request = client_req.split('\r\n')
+    request_method = parse_request[0].split()[0]
+    request_path = parse_request[0].split()[1]
+    request_protocol = parse_request[0].split()[2]
+    file_path_tuple = os.path.split(request_path)
+    file_name = file_path_tuple[1]
+    file_extension_tuple = os.path.splitext(file_name)
+    file_extension = file_extension_tuple[1]
 
 
-       #READing file
-    #    try:
-    #         with open(filename) as fp:
-    #             data = fp.read()   # Read entire file
-    #             return data
-
-    #     except:
-    #         # File not found or other error
-    #         # TODO send a 404
-
-    #MAPPIng
-map_ext = {'.gif': 'image/gif', '.txt': 'text/plain', '.html': 'text/HTML', '.jpeg': 'JPEG image', '.pdf': 'PDF file'}
+    #READing file
+    content_type = map_ext[file_extension]
+    try:
+        with open(file_name) as fp:
+            body = fp.read()   # Read entire file
+            content_length = len(body)
+            response = 'HTTP/1.1 200 OK\r\n\
+        Content-Type: {}\r\n\
+        Content-Length: {}\r\n\
+        Connection: close\r\n\r\n\
+        {}'.format(content_type, content_length, body).encode("ISO-8859-1")
+        new_socket.sendall(response)
+    except:
+        response = 'HTTP/1.1 404 Not Found\r\n\
+        Content-Type: {}\r\n\
+        Content-Length: 13\r\n\
+        Connection: close\r\n\r\n\
+        404 not found'.format(content_type).encode("ISO-8859-1")
+        new_socket.sendall(response)
+    new_socket.close()
