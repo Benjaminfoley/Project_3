@@ -34,12 +34,18 @@ while True:
 
 
     #PROJECT 3
-
+    
+    #parses the request by line
     parse_request = client_req.split('\r\n')
+    #using the first line get the first section
     request_method = parse_request[0].split()[0]
+    #using the first line get the second section
     request_path = parse_request[0].split()[1]
+    #using the first line get the third section
     request_protocol = parse_request[0].split()[2]
+    #use os path to get the file
     file_path_tuple = os.path.split(request_path)
+    #split the file name and file type
     file_name = file_path_tuple[1]
     file_extension_tuple = os.path.splitext(file_name)
     file_extension = file_extension_tuple[1]
